@@ -26,6 +26,11 @@ class CreateFilesTable extends Migration
                 ->nullable()
                 ->comment("Расширение файла");
 
+            $table->unsignedBigInteger("priority")
+                ->default(0);
+
+            $table->nullableMorphs("fileable");
+
             $table->timestamps();
         });
     }

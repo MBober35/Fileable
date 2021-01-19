@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class FileModel extends Model
 {
     use HasFactory;
+
+    public function fileable()
+    {
+        return $this->morphTo();
+    }
 }

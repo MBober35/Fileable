@@ -14,7 +14,7 @@ class FilesCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'files
+    protected $signature = 'fileable
                     { --no-replace : Without replace any files }';
 
     /**
