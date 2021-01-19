@@ -1,0 +1,7 @@
+<?php
+
+namespace App\Models;
+
+use MBober35\Fileable\Models\FileModel;
+
+class File extends FileModel {}

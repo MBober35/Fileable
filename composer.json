@@ -1,0 +1,29 @@
+{
+    "name": "mbober35/fileable",
+    "description": "Model for management files",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MBober35",
+            "email": "info@mbober.ru"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "laravel/framework": "^8.0",
+        "mbober35/helpers": "@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "MBober35\\Fileable\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MBober35\\Fileable\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}
