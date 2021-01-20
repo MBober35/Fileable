@@ -4,10 +4,11 @@ namespace MBober35\Fileable\Commands;
 
 use Illuminate\Console\Command;
 use MBober35\Helpers\Traits\CopyStubs;
+use MBober35\Helpers\Traits\CopyVue;
 
 class FilesCommand extends Command
 {
-    use CopyStubs;
+    use CopyStubs, CopyVue;
 
     /**
      * The name and signature of the console command.
@@ -26,6 +27,13 @@ class FilesCommand extends Command
 
     protected $prefix;
     protected $noReplace;
+
+    protected $vueIncludes = [
+        "admin" => [
+            "image-gallery" => "GalleryComponent",
+        ],
+    ];
+    protected $vueFolder = "Fileable";
 
     /**
      * Create a new command instance.
@@ -49,6 +57,8 @@ class FilesCommand extends Command
         $this->noReplace = $this->option("no-replace");
 
         $this->exports();
+
+        $this->makeVueIncludes("admin");
     }
 
     /**
@@ -61,5 +71,8 @@ class FilesCommand extends Command
 
         // Export observers.
         $this->copyStubs($this->prefix . "observers", "Observers", $this->noReplace);
+
+        // Export controllers.
+        $this->copyStubs($this->prefix . "controllers", "Http/Controllers/Fileable", $this->noReplace);
     }
 }

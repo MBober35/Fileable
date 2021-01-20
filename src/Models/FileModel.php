@@ -4,6 +4,7 @@ namespace MBober35\Fileable\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class FileModel extends Model
 {
@@ -25,5 +26,16 @@ class FileModel extends Model
     public function fileable()
     {
         return $this->morphTo();
+    }
+
+    public function getStorageAttribute()
+    {
+        return Storage::url($this->path);
+    }
+
+    public function getFileNameAttribute()
+    {
+        $exploded = explode("/", $this->path);
+        return $exploded[count($exploded) - 1];
     }
 }

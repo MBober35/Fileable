@@ -1,0 +1,7 @@
+<?php
+
+namespace App\Http\Controllers\Fileable;
+
+use MBober35\Fileable\Controllers\GalleryController as Controller;
+
+class GalleryController extends Controller {}

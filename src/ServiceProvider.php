@@ -5,6 +5,7 @@ namespace MBober35\Fileable;
 use App\Models\File;
 use Illuminate\Support\ServiceProvider as BaseProvider;
 use MBober35\Fileable\Commands\FilesCommand;
+use MBober35\Fileable\Helpers\GalleryActionsManager;
 use MBober35\Fileable\Observers\FileOberver;
 
 class ServiceProvider extends BaseProvider
@@ -22,6 +23,16 @@ class ServiceProvider extends BaseProvider
                 FilesCommand::class,
             ]);
         }
+
+        // Facades.
+        $this->app->singleton("gallery-actions", function () {
+            return new GalleryActionsManager;
+        });
+
+        // Конфигурация.
+        $this->mergeConfigFrom(
+            __DIR__ . "/config/gallery.php", "gallery"
+        );
     }
 
     /**
@@ -36,6 +47,19 @@ class ServiceProvider extends BaseProvider
 
         // Наблюдатели.
         $this->addObservers();
+
+        // Assets.
+        $this->publishes([
+            __DIR__ . '/resources/js/components' => resource_path('js/components/Fileable'),
+        ], 'public');
+
+        // Адреса.
+        $this->loadRoutesFrom(__DIR__ . '/routes/gallery.php');
+
+        // Конфигурация.
+        $this->publishes([
+            __DIR__ . "/config/gallery.php" => config_path("gallery.php"),
+        ], "config");
     }
 
     /**
