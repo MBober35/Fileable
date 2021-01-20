@@ -26,7 +26,7 @@ class ThumbnailController extends Controller
 
         switch ($template) {
             case "original":
-                return $this->buildResponse(Storage::get($image->path));
+                return $this->buildResponse(Storage::get($file->path));
 
             default:
                 return $this->makeImage($template, $file);

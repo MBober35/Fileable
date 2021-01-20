@@ -15,8 +15,20 @@ class FileOberver
      */
     public function deleted(File $file)
     {
-        // TODO: clear cut
+        $this->clearThumbs($file);
         Storage::delete($file->path);
         // TODO: make event
+    }
+
+    /**
+     * Очистить миниатюры.
+     * 
+     * @param File $file
+     */
+    protected function clearThumbs(File $file)
+    {
+        foreach ($file->thumbnails as $thumbnail) {
+            $thumbnail->delete();
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace MBober35\Fileable\Models;
 
+use App\Models\File;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -28,6 +29,16 @@ class FileModel extends Model
     public function fileable()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Миниатюры.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function thumbnails()
+    {
+        return $this->hasMany(File::class, "parent_id");
     }
 
     public function getStorageAttribute()
