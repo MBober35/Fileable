@@ -44,4 +44,15 @@ class GalleryActionsManager
         $file->save();
         return $file;
     }
+
+    /**
+     * @param Model $object
+     * @return mixed
+     */
+    public function getGalleryResource(Model $object)
+    {
+        $collection = $object->images()->orderBy("priority")->get();
+        $class = config("gallery.imageResource");
+        return $class::collection($collection);
+    }
 }

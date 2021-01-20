@@ -11,6 +11,29 @@ use MBober35\Fileable\Facades\GalleryActions;
 class GalleryController extends Controller
 {
     /**
+     * Получить изображения.
+     *
+     * @param $model
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index($model, $id)
+    {
+        if (! $modelObj = GalleryActions::getGalleryModel($model, $id)) {
+            return response()
+                ->json([
+                    "success" => false,
+                    "message" => "Model not found"
+                ]);
+        }
+        return response()
+            ->json([
+                "success" => true,
+                "images" => GalleryActions::getGalleryResource($modelObj),
+            ]);
+    }
+
+    /**
      * Загрузить изображения.
      *
      * @param Request $request
@@ -43,7 +66,7 @@ class GalleryController extends Controller
         return response()
             ->json([
                 "success" => true,
-                "images" => []
+                "images" => GalleryActions::getGalleryResource($modelObj),
             ]);
     }
 
