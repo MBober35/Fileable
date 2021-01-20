@@ -6,6 +6,7 @@ use App\Models\File;
 use Illuminate\Support\ServiceProvider as BaseProvider;
 use MBober35\Fileable\Commands\FilesCommand;
 use MBober35\Fileable\Helpers\GalleryActionsManager;
+use MBober35\Fileable\Helpers\ThumbnailActionsManager;
 use MBober35\Fileable\Observers\FileOberver;
 
 class ServiceProvider extends BaseProvider
@@ -27,6 +28,9 @@ class ServiceProvider extends BaseProvider
         // Facades.
         $this->app->singleton("gallery-actions", function () {
             return new GalleryActionsManager;
+        });
+        $this->app->singleton("thumbnail-actions", function () {
+            return new ThumbnailActionsManager;
         });
 
         // Конфигурация.
@@ -55,6 +59,7 @@ class ServiceProvider extends BaseProvider
 
         // Адреса.
         $this->loadRoutesFrom(__DIR__ . '/routes/gallery.php');
+        $this->loadRoutesFrom(__DIR__ . '/routes/thumb.php');
 
         // Конфигурация.
         $this->publishes([

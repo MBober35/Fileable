@@ -34,6 +34,14 @@ class CreateFilesTable extends Migration
                 ->default("file")
                 ->comment("Тип файла");
 
+            $table->unsignedBigInteger("parent_id")
+                ->nullable()
+                ->comment("Ссылка на оригинал");
+
+            $table->string("template")
+                ->nullable()
+                ->comment("Стиль миниатюры");
+
             $table->nullableMorphs("fileable");
 
             $table->timestamps();

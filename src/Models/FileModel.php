@@ -16,6 +16,8 @@ class FileModel extends Model
         "mime",
         "priority",
         "type",
+        "parent_id",
+        "template",
     ];
 
     /**

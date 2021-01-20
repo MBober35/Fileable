@@ -12,7 +12,8 @@
         "php": "^7.3|^8.0",
         "laravel/framework": "^8.0",
         "mbober35/helpers": "@dev",
-        "mbober35/role-rule": "@dev"
+        "mbober35/role-rule": "@dev",
+        "intervention/image": "^2.5"
     },
     "autoload": {
         "psr-4": {
