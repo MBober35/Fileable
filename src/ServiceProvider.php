@@ -5,6 +5,7 @@ namespace MBober35\Fileable;
 use App\Models\File;
 use Illuminate\Support\ServiceProvider as BaseProvider;
 use MBober35\Fileable\Commands\FilesCommand;
+use MBober35\Fileable\Commands\ThumbnailsClearCommand;
 use MBober35\Fileable\Helpers\GalleryActionsManager;
 use MBober35\Fileable\Helpers\ThumbnailActionsManager;
 use MBober35\Fileable\Observers\FileOberver;
@@ -22,6 +23,7 @@ class ServiceProvider extends BaseProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 FilesCommand::class,
+                ThumbnailsClearCommand::class,
             ]);
         }
 
