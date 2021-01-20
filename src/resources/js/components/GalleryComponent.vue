@@ -1,6 +1,7 @@
 <template>
   <div class="row">
     <div class="col-12">
+      <button type="button" class="btn" @click="getList">Click</button>
       <form>
         <div class="mb-3">
           <label for="galleryFileMultiple"
@@ -53,6 +54,36 @@
 
       <img :src="item.content" alt="Предпросмотр" class="rounded m-auto d-block img-fluid">
     </div>
+    <div class="col-12">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>#</th>
+            <th>Изображение</th>
+            <th>Имя</th>
+            <th>Действия</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="image in images" :key="image.id">
+            <td>
+              <i class="fa fa-align-justify handle cursor-move"></i>
+            </td>
+            <td>
+              <img :src="image.src" :alt="image.name">
+            </td>
+            <td>
+              {{ image.name }}
+            </td>
+            <td>
+              actions
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -60,6 +91,10 @@
 export default {
   props: {
     uploadUrl: {
+      type: String,
+      required: true
+    },
+    getUrl: {
       type: String,
       required: true
     }
@@ -71,10 +106,38 @@ export default {
       errors: {},
       fileContents: [],
       loading: false,
+      images: [],
     }
   },
 
+  created() {
+    this.getList();
+  },
+
   methods: {
+    // Получить список изображений.
+    getList() {
+      this.loading = true;
+      axios
+          .get(this.getUrl)
+          .then(response => {
+            let result = response.data;
+            if (result.success) {
+              this.images = result.images;
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Упс...',
+                text: 'Что-то пошло не так!',
+                footer: result.message,
+              })
+            }
+          })
+          .finally(() => {
+            this.loading = false;
+          })
+    },
+    // Очистить сообщения.
     resetMessages() {
       this.messages = [];
       this.errors = {};
@@ -89,7 +152,6 @@ export default {
         }
       }
     },
-
     // Сформировать данные по изображению.
     selectImage(file) {
       let reader = new FileReader();
@@ -109,12 +171,12 @@ export default {
       })(file, this.fileContents);
       reader.readAsDataURL(file);
     },
-
+    // Начать загрузку файлов.
     uploadFiles() {
       this.resetMessages();
       this.uploadSingleFile();
     },
-
+    // Отправить файл.
     uploadSingleFile() {
       this.loading = true;
       let formData = new FormData();
@@ -128,14 +190,13 @@ export default {
           })
           .then(response => {
             let result = response.data;
-            console.log(result);
             if (result.success) {
               this.fileContents.shift();
+              this.images = result.images;
               if (this.fileContents.length) {
                 this.uploadSingleFile();
               }
-            }
-            else {
+            } else {
               Swal.fire({
                 icon: 'error',
                 title: 'Упс...',
@@ -148,8 +209,7 @@ export default {
             let data = error.response.data;
             if (data.hasOwnProperty("errors")) {
               this.errors = data.errors;
-            }
-            else {
+            } else {
               Swal.fire({
                 icon: 'error',
                 title: 'Упс...',
