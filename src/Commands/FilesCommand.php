@@ -58,5 +58,8 @@ class FilesCommand extends Command
     {
         // Export models.
         $this->copyStubs($this->prefix . "models", "Models", $this->noReplace);
+
+        // Export observers.
+        $this->copyStubs($this->prefix . "observers", "Observers", $this->noReplace);
     }
 }

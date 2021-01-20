@@ -27,7 +27,12 @@ class CreateFilesTable extends Migration
                 ->comment("Расширение файла");
 
             $table->unsignedBigInteger("priority")
-                ->default(0);
+                ->default(0)
+                ->comment("Приоритет вывода");
+
+            $table->string("type")
+                ->default("file")
+                ->comment("Тип файла");
 
             $table->nullableMorphs("fileable");
 
