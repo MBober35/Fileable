@@ -22,7 +22,7 @@ class FileOberver
 
     /**
      * Очистить миниатюры.
-     * 
+     *
      * @param File $file
      */
     protected function clearThumbs(File $file)

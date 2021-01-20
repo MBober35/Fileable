@@ -15,5 +15,7 @@ Route::group([
             ->name("index");
         Route::post("/", [GalleryController::class, "store"])
             ->name("store");
+        Route::put("/", [GalleryController::class, "order"])
+            ->name("order");
     });
 });

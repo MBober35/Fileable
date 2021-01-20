@@ -13,11 +13,11 @@ class GalleryController extends Controller
     /**
      * Получить изображения.
      *
-     * @param $model
-     * @param $id
+     * @param string $model
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index($model, $id)
+    public function index(string $model, int $id)
     {
         if (! $modelObj = GalleryActions::getGalleryModel($model, $id)) {
             return response()
@@ -40,6 +40,7 @@ class GalleryController extends Controller
      * @param string $model
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request, string $model, int $id)
     {
@@ -70,6 +71,10 @@ class GalleryController extends Controller
             ]);
     }
 
+    /**
+     * @param array $data
+     * @throws \Illuminate\Validation\ValidationException
+     */
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
@@ -81,6 +86,59 @@ class GalleryController extends Controller
         ], [
             "name" => "Имя",
             "image" => "Файл",
+        ])->validate();
+    }
+
+    /**
+     * Изменить порядок вывода.
+     *
+     * @param Request $request
+     * @param string $model
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function order(Request $request, string $model, int $id)
+    {
+        $this->orderValidator($request->all());
+
+        if (! $modelObj = GalleryActions::getGalleryModel($model, $id)) {
+            return response()
+                ->json([
+                    "success" => false,
+                    "message" => "Model not found"
+                ]);
+        }
+
+        $ids = $request->get("images");
+        foreach ($ids as $priority => $id) {
+            try {
+                $file = File::find($id);
+                $file->priority = $priority;
+                $file->save();
+            }
+            catch (\Exception $exception) {
+                continue;
+            }
+        }
+
+        return response()
+            ->json([
+                "success" => true,
+                "images" => GalleryActions::getGalleryResource($modelObj),
+            ]);
+    }
+
+    /**
+     * @param array $data
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function orderValidator(array $data)
+    {
+        Validator::make($data, [
+            "images" => ["required", "array"]
+        ], [], [
+            "images" => "Изображения",
         ])->validate();
     }
 }

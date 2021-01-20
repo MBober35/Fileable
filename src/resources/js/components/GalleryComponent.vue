@@ -1,7 +1,6 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <button type="button" class="btn" @click="getList">Click</button>
       <form>
         <div class="mb-3">
           <label for="galleryFileMultiple"
@@ -57,6 +56,19 @@
     <div class="col-12">
       <div class="table-responsive">
         <table class="table">
+          <caption class="text-center">
+            <button class="btn btn-success mb-3"
+                    :disabled="loading"
+                    @click="changeOrder"
+                    v-if="priorityChange">
+                            <span class="spinner-border spinner-border-sm"
+                                  v-if="loading"
+                                  role="status"
+                                  aria-hidden="true">
+                            </span>
+              Сохранить порядок
+            </button>
+          </caption>
           <thead>
           <tr>
             <th>#</th>
@@ -65,22 +77,22 @@
             <th>Действия</th>
           </tr>
           </thead>
-          <tbody>
-          <tr v-for="image in images" :key="image.id">
-            <td>
-              <i class="fa fa-align-justify handle cursor-move"></i>
-            </td>
-            <td>
-              <img :src="image.src" :alt="image.name">
-            </td>
-            <td>
-              {{ image.name }}
-            </td>
-            <td>
-              actions
-            </td>
-          </tr>
-          </tbody>
+          <draggable :list="images" group="images" tag="tbody" handle=".handle" @change="checkMove">
+            <tr v-for="image in images" :key="image.id">
+              <td>
+                <i class="fa fa-align-justify handle"></i>
+              </td>
+              <td>
+                <img :src="image.src" :alt="image.name">
+              </td>
+              <td>
+                {{ image.name }}
+              </td>
+              <td>
+                actions
+              </td>
+            </tr>
+          </draggable>
         </table>
       </div>
     </div>
@@ -88,7 +100,13 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable';
+
 export default {
+  components: {
+    draggable,
+  },
+
   props: {
     uploadUrl: {
       type: String,
@@ -107,6 +125,7 @@ export default {
       fileContents: [],
       loading: false,
       images: [],
+      priorityChange: false,
     }
   },
 
@@ -114,7 +133,60 @@ export default {
     this.getList();
   },
 
+  computed: {
+    orderData() {
+      let ids = [];
+      for (let item in this.images) {
+        if (this.images.hasOwnProperty(item)) {
+          ids.push(this.images[item].id);
+        }
+      }
+      return ids;
+    }
+  },
+
   methods: {
+    // Изменить порядок вывода.
+    changeOrder() {
+      this.loading = true;
+      axios
+          .put(this.uploadUrl, {
+            images: this.orderData
+          })
+          .then(response => {
+            let result = response.data;
+            if (result.success) {
+              this.images = result.images;
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Упс...',
+                text: 'Что-то пошло не так!',
+                footer: result.message,
+              })
+            }
+          })
+          .catch(error => {
+            let data = error.response.data;
+            if (data.hasOwnProperty("errors")) {
+              this.errors = data.errors;
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Упс...',
+                text: 'Что-то пошло не так!',
+                footer: data.message,
+              })
+            }
+          })
+          .finally(() => {
+            this.loading = false;
+          })
+    },
+    // Приоритет изменен.
+    checkMove() {
+      this.priorityChange = true;
+    },
     // Получить список изображений.
     getList() {
       this.loading = true;
@@ -227,5 +299,7 @@ export default {
 </script>
 
 <style scoped>
-
+.handle {
+  cursor: move;
+}
 </style>

@@ -41,11 +41,21 @@ class FileModel extends Model
         return $this->hasMany(File::class, "parent_id");
     }
 
+    /**
+     * Ссылка на файл.
+     *
+     * @return string
+     */
     public function getStorageAttribute()
     {
         return Storage::url($this->path);
     }
 
+    /**
+     * Имя файла.
+     *
+     * @return mixed|string
+     */
     public function getFileNameAttribute()
     {
         $exploded = explode("/", $this->path);
