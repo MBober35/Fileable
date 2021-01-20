@@ -26,7 +26,7 @@ class ImageResource extends JsonResource
             "id" => $this->id,
             "src" => route("thumb-img", [
                 "template" => "small",
-                "file" => $this,
+                "file" => $this->file_name,
             ]),
             "priority" => $this->priority,
             "name" => $this->name,

@@ -12,6 +12,23 @@ use Intervention\Image\ImageManager;
 class ThumbnailActionsManager
 {
     /**
+     * Найти файл по имени.
+     *
+     * @param string $fileName
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
+     */
+    public function findByName(string $fileName)
+    {
+        try {
+            return File::query()
+                ->where("path", "like", "%{$fileName}")
+                ->firstOrFail();
+        } catch (\Exception $exception) {
+            abort(404);
+        }
+    }
+
+    /**
      * Применить фильтр.
      *
      * @param string $template

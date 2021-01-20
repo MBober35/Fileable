@@ -20,8 +20,9 @@ class ThumbnailController extends Controller
      * @param File $file
      * @return IlluminateResponse
      */
-    public function show(string $template, File $file)
+    public function show(string $template, string $fileName)
     {
+        $file = ThumbnailActions::findByName($fileName);
         if ($file->type != "image") abort(404);
 
         switch ($template) {
