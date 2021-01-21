@@ -1,6 +1,6 @@
 <?php
 
-namespace MBober35\Fileable\Controllers;
+namespace MBober35\Fileable\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\File;

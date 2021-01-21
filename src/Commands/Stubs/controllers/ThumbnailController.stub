@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Fileable;
+namespace App\Http\Http\Controllers\Fileable;
 
 use MBober35\Fileable\Controllers\ThumbnailController as Controller;
 
