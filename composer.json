@@ -11,8 +11,8 @@
     "require": {
         "php": "^7.3|^8.0",
         "laravel/framework": "^8.0",
-        "mbober35/helpers": "@dev",
-        "mbober35/role-rule": "@dev",
+        "mbober35/helpers": "^1.0",
+        "mbober35/role-rule": "^1.0",
         "intervention/image": "^2.5"
     },
     "autoload": {
