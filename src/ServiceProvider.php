@@ -3,12 +3,14 @@
 namespace MBober35\Fileable;
 
 use App\Models\File;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as BaseProvider;
 use MBober35\Fileable\Commands\FilesCommand;
 use MBober35\Fileable\Commands\ThumbnailsClearCommand;
 use MBober35\Fileable\Helpers\GalleryActionsManager;
 use MBober35\Fileable\Helpers\ThumbnailActionsManager;
 use MBober35\Fileable\Observers\FileOberver;
+use MBober35\Fileable\View\Components\Gallery;
 
 class ServiceProvider extends BaseProvider
 {
@@ -67,6 +69,12 @@ class ServiceProvider extends BaseProvider
         $this->publishes([
             __DIR__ . "/config/gallery.php" => config_path("gallery.php"),
         ], "config");
+
+        // Подключение шаблонов.
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'fileable');
+
+        // Компоненты.
+        Blade::component("gallery", Gallery::class);
     }
 
     /**
