@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use MBober35\Fileable\Events\ChangeImageOrder;
+use MBober35\Fileable\Events\ImageChanged;
 use MBober35\Fileable\Facades\GalleryActions;
 
 class GalleryController extends Controller
@@ -59,7 +61,7 @@ class GalleryController extends Controller
         );
         $this->modelObj->images()->save($image);
         $image = GalleryActions::setPriority($image);
-        // TODO: fire event.
+        ImageChanged::dispatch($image, "created", $this->modelObj);
 
         return response()
             ->json([
@@ -101,6 +103,7 @@ class GalleryController extends Controller
         $this->updateValidator($request->all());
         $file->name = $request->get("name");
         $file->save();
+        ImageChanged::dispatch($file, "updated", $this->modelObj);
         return response()
             ->json([
                 "success" => true,
@@ -145,6 +148,7 @@ class GalleryController extends Controller
                 continue;
             }
         }
+        ChangeImageOrder::dispatch($this->modelObj);
 
         return response()
             ->json([
@@ -178,6 +182,7 @@ class GalleryController extends Controller
     public function destroy(string $model, int $id, File $file)
     {
         $file->delete();
+        ImageChanged::dispatch($file, "deleted", $this->modelObj);
         return response()
             ->json([
                 "success" => true,

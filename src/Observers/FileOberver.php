@@ -17,7 +17,6 @@ class FileOberver
     {
         $this->clearThumbs($file);
         Storage::delete($file->path);
-        // TODO: make event
     }
 
     /**
