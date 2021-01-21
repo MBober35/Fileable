@@ -10,6 +10,17 @@ use MBober35\Fileable\Facades\GalleryActions;
 
 class GalleryController extends Controller
 {
+    protected $modelObj;
+
+    public function __construct()
+    {
+        $model = \request()->route()->parameter("model", false);
+        $id = \request()->route()->parameter("id", false);
+        if ($model && $id) {
+            $this->modelObj = GalleryActions::getGalleryModel($model, $id);
+        }
+    }
+
     /**
      * Получить изображения.
      *
@@ -19,17 +30,10 @@ class GalleryController extends Controller
      */
     public function index(string $model, int $id)
     {
-        if (! $modelObj = GalleryActions::getGalleryModel($model, $id)) {
-            return response()
-                ->json([
-                    "success" => false,
-                    "message" => "Model not found"
-                ]);
-        }
         return response()
             ->json([
                 "success" => true,
-                "images" => GalleryActions::getGalleryResource($modelObj),
+                "images" => GalleryActions::getGalleryResource($this->modelObj),
             ]);
     }
 
@@ -45,13 +49,6 @@ class GalleryController extends Controller
     public function store(Request $request, string $model, int $id)
     {
         $this->storeValidator($request->all());
-        if (! $modelObj = GalleryActions::getGalleryModel($model, $id)) {
-            return response()
-                ->json([
-                    "success" => false,
-                    "message" => "Model not found"
-                ]);
-        }
 
         $path = $request->file("image")->store("gallery/$model");
         $name = $request->get("name");
@@ -60,14 +57,14 @@ class GalleryController extends Controller
         $image = File::create(
             compact("path", "name", "mime", "type")
         );
-        $modelObj->images()->save($image);
+        $this->modelObj->images()->save($image);
         $image = GalleryActions::setPriority($image);
         // TODO: fire event.
 
         return response()
             ->json([
                 "success" => true,
-                "images" => GalleryActions::getGalleryResource($modelObj),
+                "images" => GalleryActions::getGalleryResource($this->modelObj),
             ]);
     }
 
@@ -90,6 +87,41 @@ class GalleryController extends Controller
     }
 
     /**
+     * Обновить название.
+     *
+     * @param Request $request
+     * @param string $model
+     * @param int $id
+     * @param File $file
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function update(Request $request, string $model, int $id, File $file)
+    {
+        $this->updateValidator($request->all());
+        $file->name = $request->get("name");
+        $file->save();
+        return response()
+            ->json([
+                "success" => true,
+                "images" => GalleryActions::getGalleryResource($this->modelObj),
+            ]);
+    }
+
+    /**
+     * @param array $data
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function updateValidator(array $data)
+    {
+        Validator::make($data, [
+            "name" => ["required", "string", "max:100"],
+        ], [], [
+            "name" => "Имя",
+        ])->validate();
+    }
+
+    /**
      * Изменить порядок вывода.
      *
      * @param Request $request
@@ -101,14 +133,6 @@ class GalleryController extends Controller
     public function order(Request $request, string $model, int $id)
     {
         $this->orderValidator($request->all());
-
-        if (! $modelObj = GalleryActions::getGalleryModel($model, $id)) {
-            return response()
-                ->json([
-                    "success" => false,
-                    "message" => "Model not found"
-                ]);
-        }
 
         $ids = $request->get("images");
         foreach ($ids as $priority => $id) {
@@ -125,7 +149,7 @@ class GalleryController extends Controller
         return response()
             ->json([
                 "success" => true,
-                "images" => GalleryActions::getGalleryResource($modelObj),
+                "images" => GalleryActions::getGalleryResource($this->modelObj),
             ]);
     }
 
@@ -140,5 +164,24 @@ class GalleryController extends Controller
         ], [], [
             "images" => "Изображения",
         ])->validate();
+    }
+
+    /**
+     * Удаление изображения.
+     *
+     * @param string $model
+     * @param int $id
+     * @param File $file
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function destroy(string $model, int $id, File $file)
+    {
+        $file->delete();
+        return response()
+            ->json([
+                "success" => true,
+                "images" => GalleryActions::getGalleryResource($this->modelObj)
+            ]);
     }
 }

@@ -54,21 +54,20 @@
       <img :src="item.content" alt="Предпросмотр" class="rounded m-auto d-block img-fluid">
     </div>
     <div class="col-12">
-      <div class="table-responsive">
-        <table class="table">
-          <caption class="text-center">
-            <button class="btn btn-success mb-3"
-                    :disabled="loading"
-                    @click="changeOrder"
-                    v-if="priorityChange">
+      <div class="table-responsive position-relative">
+        <div class="button-cover" v-if="priorityChange">
+          <button class="btn btn-success mb-3"
+                  :disabled="loading"
+                  @click="changeOrder">
                             <span class="spinner-border spinner-border-sm"
                                   v-if="loading"
                                   role="status"
                                   aria-hidden="true">
                             </span>
-              Сохранить порядок
-            </button>
-          </caption>
+            Сохранить порядок
+          </button>
+        </div>
+        <table class="table align-middle">
           <thead>
           <tr>
             <th>#</th>
@@ -89,11 +88,72 @@
                 {{ image.name }}
               </td>
               <td>
-                actions
+                <div role="toolbar" class="btn-toolbar">
+                  <div class="btn-group mr-1">
+                    <button type="button"
+                            @click="showEditModal(image)"
+                            :disabled="loading"
+                            class="btn btn-primary">
+                      <i class="far fa-edit"></i>
+                    </button>
+                    <button type="button"
+                            @click="destroy(image)"
+                            :disabled="loading"
+                            class="btn btn-danger">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+
               </td>
             </tr>
           </draggable>
         </table>
+      </div>
+    </div>
+    <div class="modal" id="editModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Название изображения</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" v-if="chosenImage">
+            <div class="mb-3">
+              <label for="image-name" class="visually-hidden">Email address</label>
+              <input type="email"
+                     class="form-control"
+                     id="image-name"
+                     :disabled="loading"
+                     v-model="chosenImage.nameChanged"
+                     placeholder="Название">
+            </div>
+          </div>
+          <div class="modal-footer" v-if="chosenImage">
+            <button type="button"
+                    class="btn btn-secondary"
+                    :disabled="loading"
+                    @click="closeModal()">
+                            <span class="spinner-border spinner-border-sm"
+                                  v-if="loading"
+                                  role="status"
+                                  aria-hidden="true">
+                            </span>
+              Отмена
+            </button>
+            <button type="button"
+                    :disabled="loading || ! chosenImage.nameChanged.length"
+                    @click="changeName"
+                    class="btn btn-primary">
+                            <span class="spinner-border spinner-border-sm"
+                                  v-if="loading"
+                                  role="status"
+                                  aria-hidden="true">
+                            </span>
+              Обновить
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -126,11 +186,17 @@ export default {
       loading: false,
       images: [],
       priorityChange: false,
+      chosenImage: false,
+      modal: false,
     }
   },
 
   created() {
     this.getList();
+  },
+
+  mounted() {
+    this.modal = new bootstrap.Modal(document.getElementById("editModal"));
   },
 
   computed: {
@@ -146,9 +212,76 @@ export default {
   },
 
   methods: {
+    // Удалить изображение.
+    destroy(image) {
+      Swal.fire({
+        title: "Вы уверены?",
+        text: "Изображение будет невозможно досстановить!",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: "Отмена",
+        confirmButtonText: "Да, удалить!",
+      }).then((result) => {
+        if (result.value) {
+          this.loading = true;
+          this.resetMessages();
+          axios
+              .delete(image.destroyUrl)
+              .then(response => {
+                let result = response.data;
+                if (result.success) {
+                  this.images = result.images;
+                } else {
+                  this.fireError(result.mesage);
+                }
+              })
+              .catch(error => {
+                this.parseErrors(error.response.data);
+              })
+              .finally(() => {
+                this.loading = false;
+              })
+        }
+      })
+    },
+    // Обновить название.
+    changeName() {
+      this.loading = true;
+      this.resetMessages();
+      axios
+          .put(this.chosenImage.updateUrl, {
+            "name": this.chosenImage.nameChanged,
+          })
+          .then(response => {
+            let result = response.data;
+            if (result.success) {
+              this.images = result.images;
+            } else {
+              this.fireError(result.message);
+            }
+          })
+          .catch(error => {
+            this.parseErrors(error.response.data);
+          })
+          .finally(() => {
+            this.loading = false;
+            this.modal.hide();
+          })
+    },
+    // Закрыть форму.
+    closeModal() {
+      this.chosenImage.nameChanged = this.chosenImage.name;
+      this.modal.hide();
+    },
+    // Открыть форму.
+    showEditModal(image) {
+      this.chosenImage = image;
+      this.modal.show();
+    },
     // Изменить порядок вывода.
     changeOrder() {
       this.loading = true;
+      this.resetMessages();
       axios
           .put(this.uploadUrl, {
             images: this.orderData
@@ -157,6 +290,7 @@ export default {
             let result = response.data;
             if (result.success) {
               this.images = result.images;
+              this.priorityChange = false;
             } else {
               Swal.fire({
                 icon: 'error',
@@ -167,17 +301,7 @@ export default {
             }
           })
           .catch(error => {
-            let data = error.response.data;
-            if (data.hasOwnProperty("errors")) {
-              this.errors = data.errors;
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Упс...',
-                text: 'Что-то пошло не так!',
-                footer: data.message,
-              })
-            }
+            this.parseErrors(error.response.data);
           })
           .finally(() => {
             this.loading = false;
@@ -197,13 +321,11 @@ export default {
             if (result.success) {
               this.images = result.images;
             } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Упс...',
-                text: 'Что-то пошло не так!',
-                footer: result.message,
-              })
+              this.fireError(result.message);
             }
+          })
+          .catch(error => {
+            this.parseErrors(error.response.data);
           })
           .finally(() => {
             this.loading = false;
@@ -269,30 +391,32 @@ export default {
                 this.uploadSingleFile();
               }
             } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Упс...',
-                text: 'Что-то пошло не так!',
-                footer: result.message,
-              })
+              this.fireError(result.message);
             }
           })
           .catch(error => {
-            let data = error.response.data;
-            if (data.hasOwnProperty("errors")) {
-              this.errors = data.errors;
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Упс...',
-                text: 'Что-то пошло не так!',
-                footer: data.message,
-              })
-            }
+            this.parseErrors(error.response.data);
           })
           .finally(() => {
             this.loading = false;
           })
+    },
+    // Обработать ошибки валидации.
+    parseErrors(result) {
+      if (result.hasOwnProperty("errors")) {
+        this.errors = result.errors;
+      } else {
+        this.fireError(result.message);
+      }
+    },
+    // Вызвать ошибку.
+    fireError(message) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Упс...',
+        text: 'Что-то пошло не так!',
+        footer: message,
+      })
     }
   }
 }
@@ -301,5 +425,16 @@ export default {
 <style scoped>
 .handle {
   cursor: move;
+}
+
+.button-cover {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 </style>

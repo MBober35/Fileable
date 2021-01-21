@@ -17,5 +17,9 @@ Route::group([
             ->name("store");
         Route::put("/", [GalleryController::class, "order"])
             ->name("order");
+        Route::put("/{file}", [GalleryController::class, "update"])
+            ->name("update");
+        Route::delete("/{file}", [GalleryController::class, "destroy"])
+            ->name("destroy");
     });
 });

@@ -4,6 +4,7 @@ namespace MBober35\Fileable\Helpers;
 
 use App\Models\File;
 use Illuminate\Database\Eloquent\Model;
+use MBober35\Helpers\Exceptions\PreventActionException;
 
 class GalleryActionsManager
 {
@@ -17,13 +18,14 @@ class GalleryActionsManager
     public function getGalleryModel(string $model, int $id)
     {
         $models = config("gallery.models");
-        if (empty($models[$model])) return false;
+        if (empty($models[$model])) throw new PreventActionException("Empty config", 404);
         $class = $models[$model];
-        if (! class_exists($class)) return false;
+        if (! class_exists($class)) throw new PreventActionException("Clas not found", 404);
         try {
             return $class::findOrFail($id);
         }
         catch (\Exception $exception) {
+            throw new PreventActionException("Model not found", 404);
             return false;
         }
     }

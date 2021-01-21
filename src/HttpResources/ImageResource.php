@@ -31,7 +31,16 @@ class ImageResource extends JsonResource
             "priority" => $this->priority,
             "name" => $this->name,
             "nameChanged" => $this->name,
-            "nameInput" => false,
+            "updateUrl" => route("ajax.gallery.update", [
+                "file" => $this,
+                "model" => $modelName,
+                "id" => $this->fileable_id,
+            ]),
+            "destroyUrl" => route("ajax.gallery.destroy", [
+                "file" => $this,
+                "model" => $modelName,
+                "id" => $this->fileable_id,
+            ]),
         ];
     }
 }
