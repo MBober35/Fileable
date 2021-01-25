@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Http\Http\Controllers\Fileable;
+namespace App\Http\Controllers\Fileable;
 
-use MBober35\Fileable\Controllers\ThumbnailController as Controller;
+use MBober35\Fileable\Http\Controllers\ThumbnailController as Controller;
 
 class ThumbnailController extends Controller {}

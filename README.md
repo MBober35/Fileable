@@ -16,6 +16,10 @@
     php artisan storage:link
     FILESYSTEM_DRIVER=public - что бы был доступ к файлам из паблика
 
+Публикация конфигурации:
+
+    php artisan vendor:publish --provider="MBober35\Fileable\ServiceProvider" --tag=config
+
 ### Commands
 
 `thumb:clear { --template= : clear only for template } { --all : clear all }`: очистка миниатюр изображений.
