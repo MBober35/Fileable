@@ -80,7 +80,7 @@ class ThumbnailActionsManager
         $mime = $file->mime;
         $type = "image";
         $parent_id = $file->id;
-        $path = "filters/{$template}-{$file->id}-" . Str::uuid();
+        $path = "filters/{$template}-{$file->id}-" . Str::random(40);
         Storage::put($path, $content);
         $image = File::create(
             compact("path", "name", "mime", "type", "template", "parent_id")

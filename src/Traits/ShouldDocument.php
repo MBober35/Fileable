@@ -1,55 +1,57 @@
 <?php
 
+
 namespace MBober35\Fileable\Traits;
+
 
 use App\Models\File;
 use Illuminate\Support\Str;
 
-trait ShouldImage
+trait ShouldDocument
 {
-    protected static function bootShouldImage()
+    protected static function bootShouldDocument()
     {
         static::deleted(function ($model) {
-            $model->clearImage(true);
+            $model->clearDocument(true);
         });
     }
 
     /**
-     * В какой столбец записать изображение.
+     * В какой сталбец записать файл.
      *
      * @return string
      */
-    protected function getImageKey()
+    protected function getDocKey()
     {
-        return ! empty($this->imageKey) ? $this->imageKey : "image_id";
+        return ! empty($this->docKey) ? $this->docKey : "document_id";
     }
 
     /**
-     * Изображение.
+     * Документ.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function image()
+    public function document()
     {
-        return $this->belongsTo(File::class, $this->getImageKey());
+        return $this->belongsTo(File::class, $this->getDocKey());
     }
 
     /**
-     * Загрузить изображение.
+     * Загрузить документ.
      *
      * @param false $path
      * @param string $inputName
      * @param string $field
      */
-    public function uploadImage($path = false, $inputName = "image", $field = "title")
+    public function uploadDocument($path = false, $inputName = "document", $field = "title")
     {
         if (! request()->hasFile($inputName)) return;
         if (! $path) $path = $this->getTable();
-        // Удалить старое изображение.
-        $this->clearImage();
+        // Удалить старый файл.
+        $this->clearDocument();
         // Получить расширение файла.
         $mime = request()->file($inputName)->getClientOriginalExtension();
-        // Сохранить файл изображения.
+        // Сохранить файл.
         $fileName = Str::random(40) . "." . $mime;
         $path = request()->file($inputName)->storeAs($path, $fileName);
         // Получить имя файла.
@@ -60,27 +62,29 @@ trait ShouldImage
             $name = request()->file($inputName)->getClientOriginalName();
             $name = str_replace(".{$mime}", "", $name);
         }
-        // Тип файла изображение.
-        $type = "image";
+        // Тип файла документ.
+        $type = "document";
         // Создание файла.
-        $image = File::create(
+        $doc = File::create(
             compact("path", "name", "mime", "type")
         );
-        $this->image()->associate($image);
+        $this->document()->associate($doc);
         $this->save();
     }
 
     /**
-     * Удалить изображение.
+     * Удалить файл.
+     *
+     * @param false $deleted
      */
-    public function clearImage($deleted = false)
+    public function clearDocument($deleted = false)
     {
-        $image = $this->image;
-        if (! empty($image)) {
-            $image->delete();
+        $doc = $this->document;
+        if (! empty($doc)) {
+            $doc->delete();
         }
         if (! $deleted) {
-            $this->image()->disassociate();
+            $this->document()->dissociate();
             $this->save();
         }
     }

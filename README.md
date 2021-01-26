@@ -40,6 +40,13 @@
 - `cover`: связь morphOne, для получения первого изображения
 - `clearImages`: удалить все изображения
 
+`ShouldDocument` трейт для добавлений файла в модель. В таблице должно быть поле `document_id`, либо можно переопределить добавлением переменной `docKey` в класс модели.
+
+После подключения у модели появляются методы:
+- `document`: связь belongsTo
+- `uploadDocument($path = false, $inputName = "document", $field = "title")`: загрузка файла из `request`
+- `clearDocument`: удалить документ
+
 ### Configuration
 
 - `models`: список моделей у которых есть галерея

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use MBober35\Fileable\Events\ChangeImageOrder;
 use MBober35\Fileable\Events\ImageChanged;
 use MBober35\Fileable\Facades\GalleryActions;
@@ -52,10 +53,11 @@ class GalleryController extends Controller
     {
         $this->storeValidator($request->all());
 
-        $path = $request->file("image")->store("gallery/$model");
+        $mime = $request->file("image")->getClientOriginalExtension();
+        $fileName = Str::random(40) . "." . $mime;
+        $path = $request->file("image")->storeAs("gallery/$model", $fileName);
         $name = $request->get("name");
         $type = "image";
-        $mime = $request->file("image")->getClientOriginalExtension();
         $image = File::create(
             compact("path", "name", "mime", "type")
         );
