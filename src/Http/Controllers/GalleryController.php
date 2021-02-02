@@ -17,10 +17,13 @@ class GalleryController extends Controller
 
     public function __construct()
     {
-        $model = \request()->route()->parameter("model", false);
-        $id = \request()->route()->parameter("id", false);
-        if ($model && $id) {
-            $this->modelObj = GalleryActions::getGalleryModel($model, $id);
+        $route = \request()->route();
+        if (! empty($route)) {
+            $model = \request()->route()->parameter("model", false);
+            $id = \request()->route()->parameter("id", false);
+            if ($model && $id) {
+                $this->modelObj = GalleryActions::getGalleryModel($model, $id);
+            }
         }
     }
 
