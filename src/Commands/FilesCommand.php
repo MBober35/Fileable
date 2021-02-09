@@ -31,6 +31,7 @@ class FilesCommand extends Command
     protected $vueIncludes = [
         "admin" => [
             "image-gallery" => "GalleryComponent",
+            "document-group" => "DocumentsComponent",
         ],
     ];
     protected $vueFolder = "Fileable";

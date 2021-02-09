@@ -1,0 +1,7 @@
+<?php
+
+namespace App\Http\Controllers\Fileable;
+
+use MBober35\Fileable\Http\Controllers\DocumentsController as Controller;
+
+class DocumentsController extends Controller {}

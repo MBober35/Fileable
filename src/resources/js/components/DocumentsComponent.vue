@@ -10,7 +10,7 @@
           <div class="input-group">
             <input class="form-control"
                    type="file"
-                   @change.prevent="getImage"
+                   @change.prevent="getDocument"
                    id="galleryFileMultiple"
                    multiple>
             <button type="button"
@@ -50,8 +50,6 @@
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
-
-      <img :src="item.content" alt="Предпросмотр" class="rounded m-auto d-block img-fluid">
     </div>
     <div class="col-12">
       <div class="table-responsive position-relative">
@@ -71,33 +69,33 @@
           <thead>
           <tr>
             <th>#</th>
-            <th>Изображение</th>
+            <th>Файл</th>
             <th>Имя</th>
             <th>Действия</th>
           </tr>
           </thead>
-          <draggable :list="images" group="images" tag="tbody" handle=".handle" @change="checkMove">
-            <tr v-for="image in images" :key="image.id">
+          <draggable :list="documents" group="documents" tag="tbody" handle=".handle" @change="checkMove">
+            <tr v-for="document in documents" :key="document.id">
               <td>
                 <i class="fa fa-align-justify handle"></i>
               </td>
               <td>
-                <img :src="image.src" :alt="image.name">
+                <a :href="document.src">Файл</a>
               </td>
               <td>
-                {{ image.name }}
+                {{ document.name }}
               </td>
               <td>
                 <div role="toolbar" class="btn-toolbar">
                   <div class="btn-group mr-1">
                     <button type="button"
-                            @click="showEditModal(image)"
+                            @click="showEditModal(document)"
                             :disabled="loading"
                             class="btn btn-primary">
                       <i class="far fa-edit"></i>
                     </button>
                     <button type="button"
-                            @click="destroy(image)"
+                            @click="destroy(document)"
                             :disabled="loading"
                             class="btn btn-danger">
                       <i class="fas fa-trash-alt"></i>
@@ -118,18 +116,18 @@
             <h5 class="modal-title">Название изображения</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body" v-if="chosenImage">
+          <div class="modal-body" v-if="chosenDocument">
             <div class="mb-3">
-              <label for="image-name" class="visually-hidden">Email address</label>
+              <label for="document-name" class="visually-hidden">Email address</label>
               <input type="email"
                      class="form-control"
-                     id="image-name"
+                     id="document-name"
                      :disabled="loading"
-                     v-model="chosenImage.nameChanged"
+                     v-model="chosenDocument.nameChanged"
                      placeholder="Название">
             </div>
           </div>
-          <div class="modal-footer" v-if="chosenImage">
+          <div class="modal-footer" v-if="chosenDocument">
             <button type="button"
                     class="btn btn-secondary"
                     :disabled="loading"
@@ -142,7 +140,7 @@
               Отмена
             </button>
             <button type="button"
-                    :disabled="loading || ! chosenImage.nameChanged.length"
+                    :disabled="loading || ! chosenDocument.nameChanged.length"
                     @click="changeName"
                     class="btn btn-primary">
                             <span class="spinner-border spinner-border-sm"
@@ -184,9 +182,9 @@ export default {
       errors: {},
       fileContents: [],
       loading: false,
-      images: [],
+      documents: [],
       priorityChange: false,
-      chosenImage: false,
+      chosenDocument: false,
       modal: false,
     }
   },
@@ -202,9 +200,9 @@ export default {
   computed: {
     orderData() {
       let ids = [];
-      for (let item in this.images) {
-        if (this.images.hasOwnProperty(item)) {
-          ids.push(this.images[item].id);
+      for (let item in this.documents) {
+        if (this.documents.hasOwnProperty(item)) {
+          ids.push(this.documents[item].id);
         }
       }
       return ids;
@@ -213,10 +211,10 @@ export default {
 
   methods: {
     // Удалить изображение.
-    destroy(image) {
+    destroy(document) {
       Swal.fire({
         title: "Вы уверены?",
-        text: "Изображение будет невозможно восстановить!",
+        text: "Файл будет невозможно восстановить!",
         type: "warning",
         showCancelButton: true,
         cancelButtonText: "Отмена",
@@ -226,11 +224,11 @@ export default {
           this.loading = true;
           this.resetMessages();
           axios
-              .delete(image.destroyUrl)
+              .delete(document.destroyUrl)
               .then(response => {
                 let result = response.data;
                 if (result.success) {
-                  this.images = result.images;
+                  this.documents = result.documents;
                 } else {
                   this.fireError(result.mesage);
                 }
@@ -249,13 +247,13 @@ export default {
       this.loading = true;
       this.resetMessages();
       axios
-          .put(this.chosenImage.updateUrl, {
-            "name": this.chosenImage.nameChanged,
+          .put(this.chosenDocument.updateUrl, {
+            "name": this.chosenDocument.nameChanged,
           })
           .then(response => {
             let result = response.data;
             if (result.success) {
-              this.images = result.images;
+              this.documents = result.documents;
             } else {
               this.fireError(result.message);
             }
@@ -270,12 +268,12 @@ export default {
     },
     // Закрыть форму.
     closeModal() {
-      this.chosenImage.nameChanged = this.chosenImage.name;
+      this.chosenDocument.nameChanged = this.chosenDocument.name;
       this.modal.hide();
     },
     // Открыть форму.
-    showEditModal(image) {
-      this.chosenImage = image;
+    showEditModal(document) {
+      this.chosenDocument = document;
       this.modal.show();
     },
     // Изменить порядок вывода.
@@ -284,12 +282,12 @@ export default {
       this.resetMessages();
       axios
           .put(this.uploadUrl, {
-            images: this.orderData
+            documents: this.orderData
           })
           .then(response => {
             let result = response.data;
             if (result.success) {
-              this.images = result.images;
+              this.documents = result.documents;
               this.priorityChange = false;
             } else {
               Swal.fire({
@@ -319,7 +317,7 @@ export default {
           .then(response => {
             let result = response.data;
             if (result.success) {
-              this.images = result.images;
+              this.documents = result.documents;
             } else {
               this.fireError(result.message);
             }
@@ -337,17 +335,17 @@ export default {
       this.errors = {};
     },
     // Получить выбранное изображение.
-    getImage(event) {
+    getDocument(event) {
       this.resetMessages();
       this.fileContents = [];
       for (let item in event.target.files) {
         if (event.target.files.hasOwnProperty(item)) {
-          this.selectImage(event.target.files[item]);
+          this.selectDocument(event.target.files[item]);
         }
       }
     },
     // Сформировать данные по изображению.
-    selectImage(file) {
+    selectDocument(file) {
       let reader = new FileReader();
       reader.onload = (function (inputFile, contents) {
         return function (event) {
@@ -376,7 +374,7 @@ export default {
       let formData = new FormData();
       let file = this.fileContents[0].file;
       let name = this.fileContents[0].name;
-      formData.append("image", file);
+      formData.append("document", file);
       formData.append("name", name);
       axios
           .post(this.uploadUrl, formData, {
@@ -386,7 +384,7 @@ export default {
             let result = response.data;
             if (result.success) {
               this.fileContents.shift();
-              this.images = result.images;
+              this.documents = result.documents;
               if (this.fileContents.length) {
                 this.uploadSingleFile();
               }
@@ -436,5 +434,6 @@ export default {
   width: 100%;
   align-items: center;
   justify-content: center;
+  z-index: 100;
 }
 </style>

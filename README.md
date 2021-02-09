@@ -59,3 +59,8 @@
 Параметры: `model`, `id`
 
     <x-gallery model="user" id="{{ \Illuminate\Support\Facades\Auth::id() }}"></x-gallery>
+
+Вывод документов `x-documents`
+Параметры: `model`, `id`
+
+    <x-documents model="user" id="{{\Illuminate\Support\Facades\Auth::id() }}"></x-documents>
