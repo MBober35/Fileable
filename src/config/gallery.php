@@ -2,6 +2,7 @@
 
 return [
     "models" => [],
+    "validation" => [],
     "imageResource" => \MBober35\Fileable\Http\Resources\ImageResource::class,
     "templates" => [
         "small" => \MBober35\Fileable\Templates\Small::class,

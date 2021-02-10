@@ -9,6 +9,19 @@ use MBober35\Helpers\Exceptions\PreventActionException;
 class GalleryActionsManager
 {
     /**
+     * Валидация.
+     *
+     * @param string $model
+     * @return mixed|string
+     */
+    public function getValidation(string $model)
+    {
+        $validation = config("gallery.validation");
+        if (empty($validation[$model])) return "";
+        return $validation[$model];
+    }
+
+    /**
      * Получить модель.
      *
      * @param string $model

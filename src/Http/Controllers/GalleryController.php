@@ -14,6 +14,7 @@ use MBober35\Fileable\Facades\GalleryActions;
 class GalleryController extends Controller
 {
     protected $modelObj;
+    protected $validationFile;
 
     public function __construct()
     {
@@ -23,6 +24,9 @@ class GalleryController extends Controller
             $id = $route->parameter("id", false);
             if ($model && $id) {
                 $this->modelObj = GalleryActions::getGalleryModel($model, $id);
+            }
+            if ($model) {
+                $this->validationFile = GalleryActions::getValidation($model);
             }
         }
     }
@@ -90,6 +94,27 @@ class GalleryController extends Controller
         ], [
             "name" => "Имя",
             "image" => "Файл",
+        ])->validate();
+        $this->extValiadtion();
+    }
+
+    /**
+     * Валидация расширения.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function extValiadtion()
+    {
+        if (empty($this->validationFile)) return;
+        $data = [
+            "image" => strtolower(\request()->file("image")->getClientOriginalExtension()),
+        ];
+        Validator::make($data, [
+            "image" => ["required", "in:{$this->validationFile}"],
+        ], [
+            "image.in" => "Файл должен быть расширения: {$this->validationFile}",
+        ], [
+            "image" => "Изображение",
         ])->validate();
     }
 

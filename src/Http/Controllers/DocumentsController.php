@@ -15,15 +15,20 @@ use MBober35\Fileable\Facades\DocumentActions;
 class DocumentsController
 {
     protected $modelObj;
+    protected $validationFile;
 
     public function __construct()
     {
         $route = request()->route();
+        $this->validationFile = [];
         if (! empty($route)) {
             $model = $route->parameter("model", false);
             $id = $route->parameter("id", false);
             if ($model && $id) {
                 $this->modelObj = DocumentActions::getModel($model, $id);
+            }
+            if ($model) {
+                $this->validationFile = DocumentActions::getValidation($model);
             }
         }
     }
@@ -44,6 +49,13 @@ class DocumentsController
             ]);
     }
 
+    /**
+     * @param Request $request
+     * @param string $model
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function store(Request $request, string $model, int $id)
     {
         $this->storeValidator($request->all());
@@ -68,6 +80,10 @@ class DocumentsController
             ]);
     }
 
+    /**
+     * @param array $data
+     * @throws \Illuminate\Validation\ValidationException
+     */
     protected function storeValidator(array $data)
     {
         Validator::make($data, [
@@ -78,7 +94,28 @@ class DocumentsController
             "document.file" => "Не удалось загрузить документ",
         ], [
             "name" => "Имя",
-            "image" => "Файл",
+            "document" => "Файл",
+        ])->validate();
+        $this->extValidation();
+    }
+
+    /**
+     * Валидация расширения.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function extValidation()
+    {
+        if (empty($this->validationFile)) return;
+        $data = [
+            "document" => strtolower(\request()->file("document")->getClientOriginalExtension()),
+        ];
+        Validator::make($data, [
+            "document" => ["required", "in:{$this->validationFile}"],
+        ], [
+            "document.in" => "Файл должен быть расширения: {$this->validationFile}"
+        ], [
+            "document" => "Файл"
         ])->validate();
     }
 

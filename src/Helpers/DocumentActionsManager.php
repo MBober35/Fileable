@@ -11,6 +11,18 @@ use MBober35\Helpers\Exceptions\PreventActionException;
 class DocumentActionsManager
 {
     /**
+     * Валидация.
+     *
+     * @param string $model
+     * @return string
+     */
+    public function getValidation(string $model)
+    {
+        $validation = config("documents.validation");
+        if (empty($validation[$model])) return "";
+        return $validation[$model];
+    }
+    /**
      * Получить модель.
      *
      * @param string $model

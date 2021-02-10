@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Facade;
 use MBober35\Fileable\Helpers\GalleryActionsManager;
 
 /**
+ * @method static string getValidation(string $model)
  * @method static bool|Model getGalleryModel(string $model, int $id)
  * @method static File setPriority(File $file)
  * @method static getGalleryResource(Model $object)
