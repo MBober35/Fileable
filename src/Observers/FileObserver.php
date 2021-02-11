@@ -5,7 +5,7 @@ namespace MBober35\Fileable\Observers;
 use App\Models\File;
 use Illuminate\Support\Facades\Storage;
 
-class FileOberver
+class FileObserver
 {
     /**
      * Handle the File "deleted" event.
