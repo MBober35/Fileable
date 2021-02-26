@@ -54,7 +54,9 @@ class GalleryActionsManager
         $max = File::query()
             ->where("fileable_type", $file->fileable_type)
             ->where("fileable_id", $file->fileable_id)
+            ->where("type", "image")
             ->max("priority");
+        if (! isset($max)) $max = -1;
         $file->priority = $max + 1;
         $file->save();
         return $file;
