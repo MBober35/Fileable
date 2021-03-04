@@ -94,8 +94,8 @@ class ServiceProvider extends BaseProvider
     protected function addObservers()
     {
         if (
-            file_exists(app_path("Observers\FileObserver.php")) &&
-            file_exists(app_path("Models\File.php"))
+            file_exists(app_path("Observers/FileObserver.php")) &&
+            file_exists(app_path("Models/File.php"))
         ) {
             File::observe(FileObserver::class);
         }
