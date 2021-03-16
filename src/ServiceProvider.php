@@ -13,6 +13,7 @@ use MBober35\Fileable\Helpers\GalleryActionsManager;
 use MBober35\Fileable\Helpers\ThumbnailActionsManager;
 use MBober35\Fileable\View\Components\Documents;
 use MBober35\Fileable\View\Components\Gallery;
+use MBober35\Fileable\View\Components\Picture;
 
 class ServiceProvider extends BaseProvider
 {
@@ -78,6 +79,7 @@ class ServiceProvider extends BaseProvider
         $this->publishes([
             __DIR__ . "/config/gallery.php" => config_path("gallery.php"),
             __DIR__ . "/config/documents.php" => config_path("documents.php"),
+            __DIR__ . "/config/imagecache.php" => config_path("imagecache.php"),
         ], "config");
 
         // Подключение шаблонов.
@@ -86,6 +88,7 @@ class ServiceProvider extends BaseProvider
         // Компоненты.
         Blade::component("gallery", Gallery::class);
         Blade::component("documents", Documents::class);
+        Blade::component("picture", Picture::class);
     }
 
     /**

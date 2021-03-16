@@ -17,7 +17,7 @@ class ThumbnailController extends Controller
      * Получить изображение.
      *
      * @param string $template
-     * @param File $file
+     * @param string $fileName
      * @return IlluminateResponse
      */
     public function show(string $template, string $fileName)

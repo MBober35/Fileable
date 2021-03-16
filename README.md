@@ -64,3 +64,10 @@
 Параметры: `model`, `id`
 
     <x-documents model="user" id="{{\Illuminate\Support\Facades\Auth::id() }}"></x-documents>
+
+Вывод тега picture `x-picture`
+Параметры: `template`, `:image`, `:grid`, `class`
+
+    @php($image = ["file_name" => "unsplash.jpg", "name" => "unsplash"])
+    @php($grid = [1400 => "large", 992 => "medium"])
+    <x-picture template="small" :image="$image" :grid="$grid" class="hello"></x-picture>
